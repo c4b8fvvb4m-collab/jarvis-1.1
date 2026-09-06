@@ -171,3 +171,20 @@ async function sendMessage() {
     const response = await generateResponse(message);
     addMessage(response, "jarvis");
 }
+document.getElementById('searchBtn').addEventListener('click', async () => {
+  const query = document.getElementById('searchInput').value;
+  const resultsDiv = document.getElementById('results');
+  resultsDiv.innerText = "Searching...";
+
+  try {
+    const response = await fetch(
+      `https://api.bing.microsoft.com/v7.0/search?q=${encodeURIComponent(query)}`,
+      { headers: { 'Ocp-Apim-Subscription-Key': 'YOUR_API_KEY_HERE' } }
+    );
+    const data = await response.json();
+    const pages = data.webPages?.value || [];
+    resultsDiv.innerHTML = pages.map(p => `<p><a href="${p.url}">${p.name}</a><br>${p.snippet}</p>`).join('');
+  } catch (err) {
+    resultsDiv.innerText = "Error: " + err.message;
+  }
+});
