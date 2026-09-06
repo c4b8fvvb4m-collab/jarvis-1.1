@@ -134,3 +134,40 @@ app.get("/api/search", async (req, res) => {
   });
   res.json(await response.json());
 });
+async function generateResponse(message) {
+    // 1. Keep equation solver client-side if desired
+    const equationAnswer = solveEquation(message);
+    if (equationAnswer !== null) {
+        return "I've solved the equation. " + equationAnswer;
+    }
+
+    // 2. Fetch response from your API backend
+    try {
+        const res = await fetch("/api/chat", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({ prompt: message })
+        });
+
+        const data = await res.json();
+        return data.reply;
+    } catch (error) {
+        console.error("API Error:", error);
+        return "System error: Unable to connect to the AI reasoning engine.";
+    }
+}
+
+async function sendMessage() {
+    const message = chatInput.value.trim();
+
+    if (message === "") return;
+
+    addMessage(message, "user");
+    chatInput.value = "";
+
+    // Fetch response asynchronously
+    const response = await generateResponse(message);
+    addMessage(response, "jarvis");
+}
