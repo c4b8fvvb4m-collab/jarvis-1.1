@@ -128,3 +128,9 @@ chatInput.addEventListener("keydown", function(event) {
 });
 
 console.log("JARVIS 1.1 online.");
+app.get("/api/search", async (req, res) => {
+  const response = await fetch(`YOUR_SEARCH_API_URL?q=${encodeURIComponent(req.query.q)}`, {
+    headers: { Authorization: `Bearer ${process.env.SEARCH_API_KEY}` }
+  });
+  res.json(await response.json());
+});
